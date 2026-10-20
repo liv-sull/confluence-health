@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Confluence Content Health</title>
+<style>
+:root{
+  --bg:#fcfcfb; --ink:#141413; --ink-2:#52514e; --ink-3:#8a8984; --rule:#e3e2de; --track:#efeee9;
+  --a1:#86b6ef; --a2:#3f8fe4; --a3:#1f64b8; --a4:#0d3a73;
+  --accent:#2a78d6; --current:#c9c7c0; --orange:#eb6834; --tip:#141413; --tip-ink:#fcfcfb;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1a1a19; --ink:#f0efec; --ink-2:#c3c2b7; --ink-3:#8f8e87; --rule:#383835; --track:#2a2a28;
+    --a1:#86b6ef; --a2:#5598e7; --a3:#2a78d6; --a4:#184f95;
+    --accent:#3987e5; --current:#55544f; --orange:#d95926; --tip:#f0efec; --tip-ink:#1a1a19;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1a1a19; --ink:#f0efec; --ink-2:#c3c2b7; --ink-3:#8f8e87; --rule:#383835; --track:#2a2a28;
+  --a1:#86b6ef; --a2:#5598e7; --a3:#2a78d6; --a4:#184f95;
+  --accent:#3987e5; --current:#55544f; --orange:#d95926; --tip:#f0efec; --tip-ink:#1a1a19;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 "Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+main{max-width:1180px;margin:0 auto;padding:28px 24px 48px}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:0 0 6px}
+h1{font-size:30px;line-height:1.1;margin:0 0 4px;font-weight:700;letter-spacing:-.01em}
+.sub{color:var(--ink-2);margin:0}
+.top{display:grid;grid-template-columns:1.25fr 2fr;gap:40px;align-items:end;margin:28px 0 8px;padding-bottom:28px;border-bottom:1px solid var(--ink)}
+.hero .n{font-size:112px;line-height:.9;font-weight:700;letter-spacing:-.04em}
+.hero .n span{font-size:56px;letter-spacing:0}
+.hero p{margin:10px 0 0;max-width:30ch;color:var(--ink-2)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:22px 28px}
+.stat{border-left:1px solid var(--rule);padding-left:14px}
+.stat .v{font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.stat .l{font-size:12.5px;color:var(--ink-2)}
+.lede{font-size:18px;line-height:1.4;max-width:62ch;margin:24px 0 32px}
+.grid{display:grid;grid-template-columns:1.6fr 1fr;gap:48px;margin-bottom:44px}
+.grid.b{grid-template-columns:1fr 1.15fr}
+h2{font-size:15px;margin:0 0 2px;font-weight:700}
+.note{font-size:12.5px;color:var(--ink-3);margin:0 0 14px}
+svg{display:block;width:100%;height:auto;overflow:visible}
+svg text{fill:var(--ink-2);font-size:12px;font-family:inherit}
+svg .val{fill:var(--ink);font-weight:700}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--ink-2);margin:0 0 10px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--ink-3);font-size:12px;padding:0 0 6px;border-bottom:1px solid var(--ink)}
+td{padding:7px 0;border-bottom:1px solid var(--rule)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tr.em td{font-weight:700}
+.tag{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:0;background:var(--rule)}
+.tag.on{background:var(--a4)}
+.tag.mid{background:var(--a2)}
+footer{padding-top:24px;font-size:12.5px;color:var(--ink-3);max-width:80ch}
+.bar:hover,.bar:focus{opacity:.8;outline:none}
+#tip{position:fixed;pointer-events:none;background:var(--tip);color:var(--tip-ink);font-size:12.5px;padding:6px 9px;border-radius:4px;opacity:0;transition:opacity .08s;z-index:5;white-space:nowrap}
+.scale{margin:8px 0 48px;padding:26px 0 30px;border-top:1px solid var(--ink);border-bottom:1px solid var(--rule)}
+.scale h2{font-size:22px;margin-bottom:6px;letter-spacing:-.01em}
+.scale .note{font-size:13.5px;color:var(--ink-2);max-width:68ch}
+.ctrl{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--ink-2);margin:12px 0 20px}
+.ctrl input{accent-color:var(--accent);width:160px}
+.ctrl b{color:var(--ink);font-variant-numeric:tabular-nums}
+.effort{display:grid;grid-template-columns:240px 1fr;gap:10px 18px;align-items:center}
+.effort .lab{font-size:13.5px}
+.effort .lab small{display:block;color:var(--ink-3);font-size:12px}
+.track{height:26px;position:relative}
+.fill{height:100%;background:var(--accent);border-radius:0 3px 3px 0;min-width:3px}
+.fill.hi{background:var(--a4)}
+.track span{position:absolute;top:4px;font-size:13px;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+.batches{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:30px}
+.batch{border-top:3px solid var(--accent);padding-top:10px}
+.batch h3{font-size:13px;margin:0 0 2px}
+.batch .meta{font-size:12px;color:var(--ink-3);margin-bottom:8px}
+.batch ul{list-style:none;margin:0;padding:0;font-size:12.5px}
+.batch li{display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-bottom:1px solid var(--rule)}
+.batch li em{font-style:normal;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.rovo{margin-top:26px;font-size:13.5px;color:var(--ink-2);max-width:78ch;border-left:3px solid var(--rule);padding-left:14px}
+@media (max-width:820px){.effort{grid-template-columns:1fr}.batches{grid-template-columns:1fr 1fr}}
+@media (max-width:480px){.batches{grid-template-columns:1fr}}
+.tests{margin-top:30px}
+.tests h3{font-size:15px;margin:0 0 4px}
+.tests ol{list-style:none;margin:12px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,1fr);gap:0 36px}
+.tests li{padding:12px 0;border-top:1px solid var(--rule);font-size:13.5px;color:var(--ink-2)}
+.tests li b{display:block;color:var(--ink);font-size:13.5px;margin-bottom:3px}
+.tests li .so{display:block;margin-top:4px;color:var(--ink)}
+.tests .bottom{margin:14px 0 0;font-size:14px;color:var(--ink);font-weight:700}
+@media (max-width:820px){.tests ol{grid-template-columns:1fr}}
+
+.mast{padding:8px 0 30px;border-bottom:1px solid var(--ink);margin-bottom:8px}
+.mast h1{font-size:44px;line-height:1.05;letter-spacing:-.025em;margin:8px 0 14px;max-width:16ch}
+.mast .sub{font-size:17px;max-width:54ch}
+main>section{display:grid;grid-template-columns:72px 1fr;gap:0 8px;padding:36px 0;border-bottom:1px solid var(--rule)}
+main>section.scale{border-top:0}
+.sn{font-size:13px;font-weight:700;color:var(--ink-3);letter-spacing:.06em;padding-top:5px;font-variant-numeric:tabular-nums}
+main>section>div{min-width:0}
+main>section h2{font-size:24px;letter-spacing:-.015em;margin:0 0 12px;line-height:1.15}
+main>section p{max-width:66ch;margin:0 0 12px}
+.terms{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:22px 0 0;padding:16px 0 0;border-top:1px solid var(--rule)}
+.terms dt{font-weight:700;font-size:13.5px}
+.terms dd{margin:2px 0 0;font-size:13px;color:var(--ink-2)}
+.hero{display:flex;align-items:flex-end;gap:22px;margin:14px 0 26px}
+.hero .n{font-size:120px;line-height:.82;font-weight:700;letter-spacing:-.045em}
+.hero .n span{font-size:56px;letter-spacing:0}
+.hero p{font-size:18px;max-width:28ch;margin:0 0 4px;color:var(--ink)}
+.facts{display:grid;grid-template-columns:repeat(2,1fr);gap:0 40px}
+.fact{display:grid;grid-template-columns:118px 1fr;gap:14px;align-items:baseline;padding:14px 0;border-top:1px solid var(--rule)}
+.fn{font-size:26px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;text-align:right}
+.ft{font-size:14px;color:var(--ink-2)}
+.ft b{color:var(--ink);font-weight:600}
+figure{margin:0}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:44px;margin:6px 0 40px}
+figure h3,.tests h3,.ask h3{font-size:15px;margin:0 0 4px}
+.cap{font-size:13px;color:var(--ink-3);margin:0 0 14px!important}
+.acts td.an{white-space:nowrap;padding-right:18px}
+.acts td.wm{color:var(--ink-2);font-size:13px;padding-right:18px}
+.punch{font-size:17px;line-height:1.45;color:var(--ink);margin:22px 0 0!important;max-width:60ch!important;font-weight:600}
+.lead{font-size:19px;line-height:1.35;color:var(--ink);font-weight:600}
+.ask{margin-top:30px;padding:20px 22px;background:var(--track);border-radius:4px;max-width:720px}
+.ask ul{margin:8px 0 0;padding-left:18px}
+.ask li{margin:6px 0;font-size:14.5px}
+footer h3{font-size:13px;margin:0 0 6px;color:var(--ink-2)}
+footer p{margin:0 0 6px}
+@media (max-width:820px){
+  main>section{grid-template-columns:1fr}
+  .sn{padding:0 0 6px}
+  .mast h1{font-size:34px}
+  .pair,.facts{grid-template-columns:1fr}
+  .terms{grid-template-columns:1fr}
+  .hero{flex-direction:column;align-items:flex-start;gap:10px}
+  .hero .n{font-size:92px}
+  .fact{grid-template-columns:96px 1fr}
+  .fn{font-size:22px}
+  .acts td.wm{display:none}
+  .acts th:nth-child(2){display:none}
+}
+table.sortable th[data-t]{cursor:pointer;user-select:none;white-space:nowrap}
+table.sortable th[data-t]:hover,table.sortable th[data-t]:focus{color:var(--ink);outline:none}
+table.sortable th[aria-sort=ascending]::after{content:" \2191"}
+table.sortable th[aria-sort=descending]::after{content:" \2193"}
+tfoot td{border-bottom:0;padding-top:9px}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
+a:hover{border-bottom-color:var(--accent)}
+.detail{margin-top:34px}
+.tw{overflow-x:auto}
+.detail table td,.detail table th{padding-right:12px}
+.detail table td:last-child,.detail table th:last-child{padding-right:0}
+.builder label{display:block;font-size:13px;color:var(--ink-2);margin-top:6px}
+.builder input[type=url]{width:100%;font:inherit;padding:8px 10px;border:1px solid var(--rule);border-radius:4px;background:var(--bg);color:var(--ink);margin:4px 0 4px}
+/* builder */
+.builder{max-width:640px;margin:60px auto;padding:0 24px}
+.builder h1{margin-bottom:12px}
+.builder ol{padding-left:20px;color:var(--ink-2)}
+.builder input[type=file]{margin:18px 0}
+.builder textarea{width:100%;height:120px;font:12px/1.4 ui-monospace,Menlo,monospace;background:var(--track);color:var(--ink);border:1px solid var(--rule);padding:10px;border-radius:4px}
+.builder button{font:inherit;background:var(--ink);color:var(--bg);border:0;padding:9px 16px;border-radius:4px;cursor:pointer;margin-top:10px}
+.err{color:#d03b3b}
+@media (max-width:820px){
+  .top,.grid,.grid.b{grid-template-columns:1fr;gap:28px}
+  .hero .n{font-size:84px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="tip" role="tooltip"></div>
+<script>
+(function(){
+const app=document.getElementById('app'), tip=document.getElementById('tip');
+const fmt=n=>Number(n).toLocaleString('en-AU');
+const pct=n=>(n>=0.995&&n<1)?'99%+':Math.round(n*100)+'%';
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function decode(h){
+  let b=h.replace(/-/g,'+').replace(/_/g,'/'); while(b.length%4)b+='=';
+  const bin=atob(b), bytes=Uint8Array.from(bin,c=>c.charCodeAt(0));
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+function encode(obj){
+  const bytes=new TextEncoder().encode(JSON.stringify(obj)); let bin='';
+  bytes.forEach(b=>bin+=String.fromCharCode(b));
+  return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+
+/* hover layer */
+document.addEventListener('pointermove',e=>{
+  const t=e.target.closest&&e.target.closest('[data-tip]');
+  if(!t){tip.style.opacity=0;return}
+  tip.textContent=t.getAttribute('data-tip'); tip.style.opacity=1;
+  const w=tip.offsetWidth; let x=e.clientX+14; if(x+w>innerWidth-8)x=e.clientX-w-14;
+  tip.style.left=x+'px'; tip.style.top=(e.clientY+14)+'px';
+});
+
+/* ---------- charts (plain SVG) ---------- */
+function columns(vals,labels,colors){
+  const W=560,H=260,top=26,bot=28,left=4,gap=18;
+  const max=Math.max(...vals), bw=(W-left-gap*(vals.length-1))/vals.length;
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Pages by time since last edit">`;
+  s+=`<line x1="0" x2="${W}" y1="${H-bot}" y2="${H-bot}" stroke="var(--ink-3)"/>`;
+  vals.forEach((v,i)=>{
+    const h=(H-top-bot)*v/max, x=left+i*(bw+gap), y=H-bot-h;
+    s+=`<path class="bar" tabindex="0" data-tip="${esc(labels[i])}: ${fmt(v)} pages" d="M${x},${H-bot} V${y+4} q0,-4 4,-4 H${x+bw-4} q4,0 4,4 V${H-bot} Z" fill="${colors[i]}"/>`;
+    s+=`<text class="val" x="${x+bw/2}" y="${y-8}" text-anchor="middle">${fmt(v)}</text>`;
+    s+=`<text x="${x+bw/2}" y="${H-8}" text-anchor="middle">${esc(labels[i])}</text>`;
+  });
+  return s+'</svg>';
+}
+function hstack(rows,labelW){
+  const W=640,rh=24,gap=6,H=rows.length*(rh+gap);
+  const max=Math.max(...rows.map(r=>r[1]+r[2]));
+  const plot=W-labelW-60;
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Spaces with the most untouched pages">`;
+  rows.forEach((r,i)=>{
+    const y=i*(rh+gap), w1=plot*r[1]/max, w2=plot*r[2]/max, x=labelW;
+    s+=`<text x="${labelW-10}" y="${y+rh/2+4}" text-anchor="end">${esc(r[0].length>40?r[0].slice(0,38)+'…':r[0])}</text>`;
+    s+=`<rect class="bar" tabindex="0" data-tip="${esc(r[0])}: ${fmt(r[1])} untouched 2+ yrs" x="${x}" y="${y}" width="${Math.max(w1-1,0)}" height="${rh}" fill="var(--accent)" rx="2"/>`;
+    if(r[2]>0) s+=`<rect class="bar" tabindex="0" data-tip="${esc(r[0])}: ${fmt(r[2])} edited in last 2 yrs" x="${x+w1+1}" y="${y}" width="${Math.max(w2-1,1)}" height="${rh}" fill="var(--current)" rx="2"/>`;
+    s+=`<text class="val" x="${x+w1+w2+8}" y="${y+rh/2+4}">${fmt(r[1])}</text>`;
+  });
+  return s+'</svg>';
+}
+function years(rows){
+  const W=560,H=280,top=10,bot=30,left=44;
+  const max=Math.max(...rows.map(r=>r[1]+r[2])), step=(W-left)/rows.length, bw=step*0.68;
+  const nice=Math.ceil(max/5000)*5000;
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Pages by year created">`;
+  for(let g=0;g<=nice;g+=5000){
+    const y=H-bot-(H-top-bot)*g/nice;
+    s+=`<line x1="${left}" x2="${W}" y1="${y}" y2="${y}" stroke="var(--rule)"/>`;
+    s+=`<text x="${left-8}" y="${y+4}" text-anchor="end">${g/1000}k</text>`;
+  }
+  rows.forEach((r,i)=>{
+    const x=left+i*step+(step-bw)/2, hu=(H-top-bot)*r[2]/nice, hk=(H-top-bot)*r[1]/nice;
+    const yb=H-bot;
+    if(r[2]) s+=`<rect class="bar" tabindex="0" data-tip="${r[0]}: ${fmt(r[2])} pages, creator has left" x="${x}" y="${yb-hu}" width="${bw}" height="${hu}" fill="var(--orange)"/>`;
+    if(r[1]) s+=`<rect class="bar" tabindex="0" data-tip="${r[0]}: ${fmt(r[1])} pages, creator named (likely owner)" x="${x}" y="${yb-hu-hk}" width="${bw}" height="${Math.max(hk-2,0)}" fill="var(--accent)" rx="2"/>`;
+    if(i%2===0||i===rows.length-1) s+=`<text x="${x+bw/2}" y="${H-10}" text-anchor="middle">${String(r[0]).slice(2)==='08'?r[0]:"'"+String(r[0]).slice(2)}</text>`;
+  });
+  return s+`<line x1="${left}" x2="${W}" y1="${H-bot}" y2="${H-bot}" stroke="var(--ink-3)"/></svg>`;
+}
+
+function render(d){
+  const date=new Date(d.d+'T00:00:00').toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'});
+  const k=d.k, a=d.a;
+  const untouched=a[2]+a[3];
+  const first=+d.y[0][0], yrs=new Date(d.d).getFullYear()-first;
+  const gone=d.y.filter(r=>+r[0]<2018).reduce((t,r)=>[t[0]+r[1],t[1]+r[2]],[0,0]);
+  const goneShare=gone[1]/(gone[0]+gone[1]);
+  const R=Object.fromEntries(d.r.map(r=>[r[0],r]));
+  const order=['Archive candidate','Archive (agreed)','Delete candidate','Merge candidate','Owner clean-up','Investigate (flagged)','Review','Keep','Keep (agreed)','Fix: pages missing a space'];
+  const what={'Archive candidate':'Nobody has edited any page in the space for 2+ years.',
+    'Archive (agreed)':'Already agreed in the manual review.',
+    'Delete candidate':'Test spaces, copies, or spaces with no pages.',
+    'Merge candidate':'Five pages or fewer, and quiet for a year. Could fold into a related space.',
+    'Owner clean-up':'Big and still in use, but at least 75% of pages are 2+ years old.',
+    'Investigate (flagged)':'Flagged in the manual review for a closer look.',
+    'Review':'Half or more of the pages are 2+ years old.',
+    'Keep':'Mostly current.',
+    'Keep (agreed)':'Agreed to keep in the manual review.',
+    'Fix: pages missing a space':'Pages the export couldn’t match to a space.'};
+  const strong=['Archive candidate','Archive (agreed)','Delete candidate','Merge candidate'];
+  const rows=order.filter(n=>R[n]).map(n=>R[n]);
+  const tot=rows.reduce((t,r)=>[t[0]+r[1],t[1]+r[2]],[0,0]);
+  const top=d.w?d.w.reduce((t,x)=>t+x[2],0):0;
+  const topShareSpaces=20/k[1];
+  const leftAll=d.y.reduce((t,x)=>t+x[2],0);
+  const noSpace=R['Fix: pages missing a space']?R['Fix: pages missing a space'][2]:0;
+
+  const spLink=(name,key)=>key&&d.b?`<a href="${esc(d.b)}/wiki/spaces/${encodeURIComponent(key)}" target="_blank" rel="noopener">${esc(name)}</a>`:esc(name);
+  const ago=y=>y==null?'':y<0.1?'This month':y<1?(Math.round(y*12)===1?'1 month ago':Math.round(y*12)+' months ago'):y.toFixed(1)+' years ago';
+  const fact=(n,lab,txt)=>`<div class="fact"><div class="fn">${n}</div><div class="ft"><b>${lab}</b>${txt}</div></div>`;
+
+  app.innerHTML=`<main>
+  <header class="mast">
+    <p class="eyebrow">Vocus Confluence · data as at ${date}</p>
+    <h1>Our wiki has outgrown our ability to check it</h1>
+    <p class="sub">Why the Confluence clean-up needs to happen in batches, starting with the 20 spaces that hold the most out-of-date content.</p>
+  </header>
+
+  <section class="intro">
+    <div class="sn">01</div>
+    <div>
+      <h2>What Confluence is, and why this matters</h2>
+      <p>Confluence is the Vocus wiki. Teams use it to write down how things work: processes, technical guides, project notes and decisions. Ours has been running since ${first}.</p>
+      <p>A page stays until someone removes it, and very few pages ever get removed. Old guidance sits right next to current guidance, and nothing tells a reader which one to trust.</p>
+      <p>That costs us when someone follows a process that changed years ago, or gives up on search because the right page is buried. It now matters for AI too. Tools like Rovo answer questions by reading these pages, so out-of-date pages produce out-of-date answers.</p>
+      <dl class="terms">
+        <div><dt>Page</dt><dd>One document in the wiki.</dd></div>
+        <div><dt>Space</dt><dd>A team or project’s area of the wiki, like a shared folder.</dd></div>
+        <div><dt>Untouched</dt><dd>Nobody has edited it. It may still be read.</dd></div>
+        <div><dt>Archive</dt><dd>Hidden from search and menus. Can be restored at any time.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="actuals">
+    <div class="sn">02</div>
+    <div>
+      <h2>The actuals</h2>
+      <p class="note">Counted from a full export of every page and space.</p>
+      <div class="hero"><div class="n">${Math.round(untouched/k[0]*100)}<span>%</span></div><p>of all wiki pages haven't been edited in two years or more. That's ${fmt(untouched)} pages.</p></div>
+      <div class="facts">
+        ${fact(fmt(k[0]),'pages in total.',` Written over ${yrs} years.`)}
+        ${fact(fmt(k[1]),'spaces.',' Each belongs to a team, project or program. Many of those projects finished long ago.')}
+        ${fact(fmt(a[3]),'pages untouched for five years or more.',` That's ${pct(a[3]/k[0])} of the wiki.`)}
+        ${fact(fmt(leftAll),'pages were written by people who have left Vocus.',` ${pct(k[3])} of all pages have no obvious person to ask whether they're still right.`)}
+        ${fact(fmt(k[4]),'spaces have had no edits at all in two years.',' Whole team areas that have gone quiet.')}
+        ${d.w?fact(fmt(top),'untouched pages sit in just 20 spaces.',` That's ${Math.round(top/untouched*100)}% of the problem in ${(topShareSpaces*100).toFixed(1)}% of spaces.`):''}
+      </div>
+    </div>
+  </section>
+
+  <section class="charts">
+    <div class="sn">03</div>
+    <div>
+      <h2>What the numbers look like</h2>
+      <div class="pair">
+        <figure>
+          <h3>How long since each page was last edited</h3>
+          <p class="cap">The further right, the longer since anyone updated it. The tallest bar is pages nobody has touched for five years or more.</p>
+          ${columns(a,['Under 1 year','1–2 years','2–5 years','5+ years'],['var(--a1)','var(--a2)','var(--a3)','var(--a4)'])}
+        </figure>
+        <figure>
+          <h3>Pages written each year, and whether the author is still here</h3>
+          <div class="legend"><span><i style="background:var(--accent)"></i>Author still named</span><span><i style="background:var(--orange)"></i>Author has left Vocus</span></div>
+          <p class="cap">${goneShare>0.98?'Almost every':Math.round(goneShare*100)+'% of'} page${goneShare>0.98?'':'s'} written before 2018 belong${goneShare>0.98?'s':''} to someone who has since left.</p>
+          ${years(d.y)}
+        </figure>
+      </div>
+      <figure class="acts">
+        <h3>What we'd suggest for each space</h3>
+        <p class="cap">We sorted all ${fmt(k[1])} spaces using simple rules based on age and size. Each one is a starting point for a conversation with the space owner. Nothing changes without them.</p>
+        <table class="sortable">
+          <thead><tr><th data-t="s">Suggestion</th><th class="ns">What it means</th><th class="num" data-t="n">Spaces</th><th class="num" data-t="n">Pages</th></tr></thead>
+          <tbody>${rows.map(r=>`<tr><td class="an" data-v="${esc(r[0])}"><span class="tag ${strong.includes(r[0])?'on':r[0]==='Owner clean-up'?'mid':''}"></span>${esc(r[0])}</td><td class="wm">${what[r[0]]||''}</td><td class="num" data-v="${r[1]}">${fmt(r[1])}</td><td class="num" data-v="${r[2]}">${fmt(r[2])}</td></tr>`).join('')}</tbody>
+          <tfoot><tr class="em"><td>Total</td><td></td><td class="num">${fmt(tot[0])}</td><td class="num">${fmt(tot[1])}</td></tr></tfoot>
+        </table>
+      </figure>
+    </div>
+  </section>
+
+  ${d.w?`<section class="scale">
+    <div class="sn">04</div>
+    <div>
+      <h2>Why it can't be done in one go</h2>
+      <p>Deciding whether a page should stay means someone has to open it and read enough to judge it. Two minutes a page sounds quick. Across the whole wiki, the hours stack up fast.</p>
+      <div class="ctrl"><label for="mpp">Minutes per page</label><input id="mpp" type="range" min="0.5" max="5" step="0.5" value="2"><b id="mppv">2</b><span>Based on 30 productive hours a week and 44 working weeks a year.</span></div>
+      <div class="effort" id="effort"></div>
+      <p class="punch" id="punch"></p>
+
+      <div class="tests">
+        <h3>We tested whether AI could do it for us</h3>
+        <p class="cap">We gave Rovo, the AI built into Confluence, four jobs on ${date}.</p>
+        <ol>
+          <li><b>Audit the whole wiki</b>It couldn't list the spaces, and every search stopped at 150 pages. It refused to guess the rest.<span class="so">Listing every page this way would take ${fmt(Math.ceil(k[0]/150))} searches before one page is judged.</span></li>
+          <li><b>Find who owns each page</b>It put the wrong person's name against a page in Network Architecture.<span class="so">Its owner names can't be trusted.</span></li>
+          <li><b>Spot pages handed to a new owner</b>On 35 recent Network Architecture pages, the owner matched the author every time.<span class="so">The author is a reliable stand-in for the owner.</span></li>
+          <li><b>Repeat that check in SysOps Documentation</b>It found 5 pages for January 2026. The export shows 26.<span class="so">21 pages were missed, with no warning.</span></li>
+        </ol>
+        <p class="bottom">AI can help judge a page once someone is looking at it. It can't count pages or work out ownership across ${fmt(k[0])} of them.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="plan">
+    <div class="sn">05</div>
+    <div>
+      <h2>What we're proposing</h2>
+      <p class="lead">Start with the 20 spaces holding the most untouched pages. Work through them five at a time.</p>
+      <p>These 20 spaces hold ${fmt(top)} untouched pages, ${Math.round(top/untouched*100)}% of the total. Working in batches gives each space owner a clear window, and lets us learn from the first batch before starting the next.</p>
+      <div class="batches">${[1,2,3,4].map(b=>{const sp=d.w.filter(x=>x[4]===b);const u=sp.reduce((t,x)=>t+x[2],0);
+        return `<div class="batch"><h3>Batch ${b}</h3><div class="meta">${fmt(u)} untouched pages</div><ul>${sp.map(x=>`<li><span>${spLink(x[0],x[5])}</span><em>${fmt(x[2])}</em></li>`).join('')}</ul></div>`}).join('')}</div>
+      <figure class="detail">
+        <h3>The 20 spaces in detail</h3>
+        <p class="cap">Click a column heading to sort. Space names open the space in Confluence.${d.x?` The full list of all ${fmt(k[1])} spaces, with filters, is in <a href="${esc(d.x)}" target="_blank" rel="noopener">the spreadsheet</a>.`:''}</p>
+        <div class="tw"><table class="sortable">
+          <thead><tr><th class="num" data-t="n">Batch</th><th data-t="s">Space</th><th class="num" data-t="n">Pages</th><th class="num" data-t="n">Untouched 2+ yrs</th><th class="num" data-t="n">% untouched</th><th class="num" data-t="n">Last edited</th><th data-t="s">Suggestion</th></tr></thead>
+          <tbody>${d.w.map(x=>`<tr><td class="num" data-v="${x[4]}">${x[4]}</td><td data-v="${esc(x[0])}">${spLink(x[0],x[5])}</td><td class="num" data-v="${x[1]}">${fmt(x[1])}</td><td class="num" data-v="${x[2]}">${fmt(x[2])}</td><td class="num" data-v="${x[2]/x[1]}">${pct(x[2]/x[1])}</td><td class="num" data-v="${x[6]??''}">${ago(x[6])}</td><td data-v="${esc(x[3])}">${esc(x[3])}</td></tr>`).join('')}</tbody>
+        </table></div>
+      </figure>
+      <div class="ask">
+        <h3>What we need to get started</h3>
+        <ul>
+          <li>Agreement to start with these 20 spaces, one batch at a time.</li>
+          <li>A named owner for each space who decides what stays.</li>
+          <li>Agreement that pages untouched for five years or more are archived unless the owner asks to keep them. Archived pages drop out of search but can be restored at any time.</li>
+          <li>A check-in after the first batch to adjust the plan.</li>
+        </ul>
+      </div>
+    </div>
+  </section>`:''}
+
+  <footer>
+    <h3>About this data</h3>
+    ${d.x?`<p><a href="${esc(d.x)}" target="_blank" rel="noopener">Open the full spreadsheet</a> to sort and filter all ${fmt(k[1])} spaces and every page in the top 20.</p>`:''}
+    <p>Source: a full Confluence export of every page and space, plus a manual review of about 50 spaces. Ages are measured from ${date}.</p>
+    <p>"Untouched" means not edited. The export doesn't include page views, so an old page can still be read and relied on. That's why every suggestion starts with a conversation.</p>
+    <p>The export lists who created each page, not who owns it. Our Rovo test showed the creator and owner matched, so creator is used as the likely owner. ${noSpace?fmt(noSpace)+' pages were exported without a space and are counted separately.':''}</p>
+  </footer>
+  </main>`;
+
+  document.querySelectorAll('table.sortable').forEach(t=>{
+    t.querySelectorAll('th[data-t]').forEach((th,_)=>{
+      const idx=[...th.parentNode.children].indexOf(th);
+      th.tabIndex=0; th.setAttribute('role','button');
+      const go=()=>{
+        const asc=th.getAttribute('aria-sort')!=='ascending';
+        t.querySelectorAll('th').forEach(x=>x.removeAttribute('aria-sort'));
+        th.setAttribute('aria-sort',asc?'ascending':'descending');
+        const tb=t.tBodies[0], rs=[...tb.rows], num=th.dataset.t==='n';
+        rs.sort((a,b)=>{let x=a.cells[idx].dataset.v, y=b.cells[idx].dataset.v;
+          if(num){x=x===''?Infinity:+x; y=y===''?Infinity:+y; return asc?x-y:y-x}
+          return asc?x.localeCompare(y):y.localeCompare(x)});
+        rs.forEach(r=>tb.appendChild(r));
+      };
+      th.addEventListener('click',go); th.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}});
+    });
+  });
+
+  if(d.w){
+    const scopes=[['Every page in the wiki',k[0],fmt(k[0])+' pages'],['Only pages untouched 2+ years',untouched,fmt(untouched)+' pages'],
+      ['The top 20 spaces',top,fmt(top)+' untouched pages'],['One batch of 5 spaces',top/4,'about '+fmt(Math.round(top/4))+' pages']];
+    const el=document.getElementById('effort'), sl=document.getElementById('mpp'), pu=document.getElementById('punch');
+    const lab=h=>{const py=h/(30*44), wk=h/30; return py>=1?py.toFixed(1)+' years of one person’s time':Math.round(wk)+' weeks of one person’s time'};
+    const draw=()=>{const m=+sl.value; document.getElementById('mppv').textContent=m;
+      const max=k[0]*m/60;
+      el.innerHTML=scopes.map((sc,i)=>{const h=sc[1]*m/60;
+        const w=Math.max(h/max*100,0.6), inside=w>58;
+        return `<div class="lab">${sc[0]}<small>${sc[2]}</small></div><div class="track"><div class="fill ${i<2?'hi':''}" style="width:${w}%" data-tip="${fmt(Math.round(h))} hours"></div><span style="${inside?'left:10px;color:#fff':'left:calc('+w+'% + 10px)'}">${fmt(Math.round(h))} hrs · ${lab(h)}</span></div>`}).join('');
+      pu.textContent=`Checking every page would take ${lab(k[0]*m/60)}. One batch of five spaces is ${lab(top/4*m/60)}, which a space owner can plan around.`;
+    };
+    sl.addEventListener('input',draw); draw();
+  }
+}
+
+/* ---------- builder: no data in the link ---------- */
+function builder(msg){
+  app.innerHTML=`<div class="builder">
+    <p class="eyebrow">Dashboard link builder</p>
+    <h1>Load the workbook to make a link</h1>
+    <ol>
+      <li>Choose your updated <b>Confluence_Content_Health_Dashboard.xlsx</b>. It's read in your browser only and isn't uploaded anywhere.</li>
+      <li>If the spreadsheet is attached to your Confluence page, paste its link first so the dashboard can point to it.</li>
+      <li>Copy the link it gives you.</li>
+      <li>Paste it into the iframe macro on your Confluence page.</li>
+    </ol>
+    ${msg?`<p class="err">${esc(msg)}</p>`:''}
+    <label for="xl">Optional: link to the spreadsheet attached on your Confluence page</label>
+    <input type="url" id="xl" placeholder="https://…">
+    <input type="file" id="f" accept=".xlsx">
+    <div id="out"></div>
+  </div>`;
+  document.getElementById('f').addEventListener('change',async e=>{
+    const file=e.target.files[0]; if(!file)return;
+    try{
+      await loadXLSX();
+      const wb=XLSX.read(await file.arrayBuffer(),{cellDates:true});
+      const cd=wb.Sheets['Chart Data'], db=wb.Sheets['Dashboard'], nt=wb.Sheets['Notes'];
+      if(!cd||!db) throw new Error('Couldn’t find the Dashboard and Chart Data tabs. Use the dashboard workbook, not the raw export.');
+      const v=(ws,a)=>ws[a]?ws[a].v:null;
+      const asAt=v(nt,'C4'); const dt=asAt instanceof Date?asAt:new Date();
+      const d={d:dt.toISOString().slice(0,10),
+        k:['B6','F6','J6','N6','R6','V6'].map(a=>v(db,a)),
+        a:[4,5,6,7].map(r=>v(cd,'B'+r)),
+        r:[...Array(10)].map((_,i)=>[v(cd,'D'+(4+i)),v(cd,'E'+(4+i)),v(cd,'F'+(4+i)),v(cd,'G'+(4+i))]).filter(r=>r[0]),
+        w:[...Array(20)].map((_,i)=>[v(cd,'Q'+(4+i)),v(cd,'R'+(4+i)),v(cd,'S'+(4+i)),v(cd,'T'+(4+i)),v(cd,'U'+(4+i)),v(cd,'V'+(4+i)),v(cd,'W'+(4+i))]).filter(r=>r[0]),
+        y:[...Array(30)].map((_,i)=>[v(cd,'M'+(4+i)),v(cd,'N'+(4+i)),v(cd,'O'+(4+i))]).filter(r=>r[0]&&/^\d{4}$/.test(String(r[0])))};
+      if(d.k.some(x=>x==null)) throw new Error('Some totals are blank. Open the workbook in Excel, save it, then try again.');
+      d.k[2]=Math.round(d.k[2]*1000)/1000; d.k[3]=Math.round(d.k[3]*1000)/1000;
+      const ss=wb.Sheets['Space Summary']; try{ d.b=new URL(v(ss,'B2')).origin }catch(_){}
+      const x=document.getElementById('xl').value.trim(); if(x) d.x=x;
+      const url=location.href.split('#')[0]+'#'+encode(d);
+      document.getElementById('out').innerHTML=`<textarea readonly>${esc(url)}</textarea><button id="cp">Copy link</button> <a href="${esc(url)}" target="_blank" rel="noopener">Preview</a>`;
+      document.getElementById('cp').onclick=()=>navigator.clipboard.writeText(url);
+    }catch(err){builder(err.message)}
+  });
+}
+function loadXLSX(){
+  if(window.XLSX)return Promise.resolve();
+  return new Promise((res,rej)=>{const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';s.onload=res;s.onerror=()=>rej(new Error('Couldn’t load the spreadsheet reader.'));document.head.appendChild(s);});
+}
+
+const h=location.hash.slice(1);
+if(h){ try{ render(decode(h)); }catch(e){ builder('That link looks incomplete. Make a fresh one below.'); } }
+else builder();
+addEventListener('hashchange',()=>location.reload());
+})();
+</script>
+</body>
+</html>
