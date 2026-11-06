@@ -267,7 +267,7 @@ function render(d){
       <h2>The plan</h2>
       <div>
         <p class="big">Start with the 20 spaces that hold ${Math.round(top/untouched*100)}% of the out-of-date pages. Work through them in four batches of five.</p>
-        <div class="strip">${batches.map(x=>`<div><b>Batch ${x.b}</b>${fmt(x.u)} pages · about ${weeksFor(x.u)} weeks</div>`).join('')}</div>
+        <div class="strip">${batches.map(x=>`<div><b>Batch ${x.b}</b>${fmt(x.u)} out-of-date pages · about ${weeksFor(x.u)} weeks</div>`).join('')}</div>
       </div>
     </div>`:''}
 
@@ -428,7 +428,7 @@ function render(d){
   /* effort slider */
   if(w.length){
     const scopes=[['Every page in the wiki',k[0],fmt(k[0])+' pages'],['Only pages not edited in 2+ years',untouched,fmt(untouched)+' pages'],
-      ['The top 20 spaces',top,fmt(top)+' pages'],['One batch of five spaces',top/4,'about '+fmt(Math.round(top/4))+' pages']];
+      ['The top 20 spaces',top,fmt(top)+' out-of-date pages'],['One batch of five spaces',top/4,'about '+fmt(Math.round(top/4))+' out-of-date pages']];
     const el=document.getElementById('effort'), sl=document.getElementById('mpp');
     const lab=h=>{const py=h/(HPW*WPY), wk=h/HPW; return py>=1?py.toFixed(1)+' years':Math.round(wk)+' weeks'};
     const draw=()=>{const m=+sl.value; document.getElementById('mppv').textContent=m;

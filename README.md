@@ -34,7 +34,7 @@ The text lives in `index.html`, inside the `render` function. Edit the file on G
 
 - Confluence page set to **full width**
 - Width **100%**, height about **1500px**. That fits the Summary tab. The Detail tab scrolls inside the frame.
-- After changing `index.html`, bump the number in the link (`?v=3` to `?v=4`). GitHub caches pages for about 10 minutes, and the new number skips the cache.
+- After changing `index.html`, bump the number in the link (`?v=5` to `?v=6`). GitHub caches pages for about 10 minutes, and the new number skips the cache.
 
 ## Things to know
 
